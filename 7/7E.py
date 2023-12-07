@@ -16,33 +16,39 @@ def GetHandType(hand):
     cardsMap = {}
     for i, c in enumerate(hand):
         if c != 1:
-            cardsMap = {hand[0]: 1}
             hand[0], hand[i] = hand[i], hand[0]
+            cardsMap = {hand[0]: 1}
             break
     jokers = 0
     for c in hand[1:]:
         if c in cardsMap:
-            if c != 1:
-                cardsMap[c] += 1
-            else:
-                jokers += 1
+            cardsMap[c] += 1
         else:
             cardsMap[c] = 1
-    sortedHand = list({k: v for k, v in sorted(cardsMap.items(), key=lambda item: item[1], reverse=True)}.items())
-    sortedHand[0][1] += jokers
-    if sortedHand[0][1] == 5:
+        if c == 1:
+            jokers += 1
+    if jokers > 0:
+        del cardsMap[1]
+    print("Card: " + ", ".join(str(c) for c in hand) + " (jokers: " + str(jokers), end=')')
+    cardsList = list(cardsMap.values())
+    if len(cardsList) == 0:
         return HandType.FIVEKIND
-    if sortedHand[0][1] == 4:
+
+    cardsList.sort(reverse=True)
+    cardsList[0] += jokers
+    if cardsList[0] == 5:
+        return HandType.FIVEKIND
+    if cardsList[0] == 4:
         return HandType.FOURKIND
-    if sortedHand[0][1] == 3:
-        if sortedHand[1][1] == 2:
+    if cardsList[0] == 3 and len(cardsList) > 1:
+        if cardsList[1] == 2:
             return HandType.FULLHOUSE
-        if sortedHand[1][1] == 1:
+        if cardsList[1] == 1:
             return HandType.THREEKIND
-    if sortedHand[0][1] == 2:
-        if sortedHand[1][1] == 2:
+    if cardsList[0] == 2 and len(cardsList) > 1:
+        if cardsList[1] == 2:
             return HandType.TWOPAIR
-        if sortedHand[1][1] == 1:
+        if cardsList[1] == 1:
             return HandType.ONEPAIR
     return HandType.HIGHCARD
 
@@ -82,8 +88,10 @@ if __name__ == '__main__':
                 hand.append(14)
             else:
                 hand.append(int(card))
-        handType = GetHandType(hand)
+        print(cardPlay[0], end='\t')
+        handType = GetHandType(list(hand))
         hands.append({"cards": hand, "bid": int(cardPlay[1].strip()), "handType": handType})
+        print("\t\t" + str(handType))
     sortedHands = sorted(hands, key=cmp_to_key(IsHandStronger))
 
     total = 0
