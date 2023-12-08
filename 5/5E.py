@@ -27,10 +27,12 @@ def readRange(lineId, rangeMap, mapIndex):
 if __name__ == '__main__':
     file = open('input.txt', 'r')
     Lines = file.readlines()
-    seeds = Lines[0].split(": ")[1].split(" ")
+    seedsRanges = Lines[0].split(": ")[1].split(" ")
+
     lineId = 3
     rangeMap = {}
 
+    print("Read Ranges")
     lineId = readRange(lineId, rangeMap, 0) + 2
     lineId = readRange(lineId, rangeMap, 1) + 2
     lineId = readRange(lineId, rangeMap, 2) + 2
@@ -39,8 +41,18 @@ if __name__ == '__main__':
     lineId = readRange(lineId, rangeMap, 5) + 2
     lineId = readRange(lineId, rangeMap, 6) + 2
 
+    seeds = []
+    seedIndex = 0
     minLocation = sys.maxsize
-    for s in seeds:
-        minLocation = min(minLocation, checkRange(int(s), rangeMap))
+
+    while seedIndex < len(seedsRanges):
+        initial = int(seedsRanges[seedIndex])
+        length = int(seedsRanges[seedIndex + 1])
+        s = initial
+        while s < initial + length:
+            print(str(seedIndex/2+1) + "/" + str(len(seedsRanges)/2) + " - (" + str(round((s - initial) / length * 100,2)) + "%) Mapping seed " + str(s))
+            minLocation = min(minLocation, checkRange(int(s), rangeMap))
+            s += 1
+        seedIndex += 2
 
     print(minLocation)
